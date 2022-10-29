@@ -2,13 +2,10 @@ import React, { useState, useEffect } from "react";
 import { styles } from "./styles";
 import {
   getFirestore,
-  addDoc,
   collection,
-  serverTimestamp,
-  onSnapshot,
-  query,
-  orderBy,
   updateDoc,
+  doc,
+  getDocs,
 } from "firebase/firestore";
 import {
   TableContainer,
@@ -20,37 +17,28 @@ import {
   Switch,
 } from "@mui/material";
 import { app } from "../../firebase";
-// import Tables from "../table/Tables";
 
 export default function SwitchTower() {
   const db = getFirestore(app);
   const [towers, setTowers] = useState([]);
+  const towerCollectionRef = collection(db, "Towers");
+  const [checked, setChecked] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "Towers"));
-
-    const unSubscribeForTowers = onSnapshot(q, (snap) => {
-      setTowers(
-        snap.docs.map((item) => {
-          return { ...item.data() };
-        })
-      );
-    });
-
-    return () => {
-      unSubscribeForTowers();
+    const getTowers = async () => {
+      const data = await getDocs(towerCollectionRef);
+      setTowers(data.docs.map((doc) => ({ ...doc.data(), id: doc })));
+      // console.log(data);
     };
+
+    getTowers();
   }, []);
 
-  const updateHandler = async (e) => {
-    e.preventDefault();
-    try {
-      await addDoc(collection(db, "Towers"), towers).then(() => {
-        alert("Tower added");
-      });
-    } catch (error) {
-      alert(error);
-    }
+  const towerSwitch = async (id, active) => {
+    const towerDoc = doc(db, "Towers", id);
+    const newFields = { active: active === true ? false : true };
+    // setChecked(active === true ? false : true);
+    await updateDoc(towerDoc, newFields);
   };
 
   return (
@@ -60,16 +48,14 @@ export default function SwitchTower() {
           <TableRow>
             <TableCell>Sl. No</TableCell>
             <TableCell>Area</TableCell>
-            <TableCell align="right">IP Address</TableCell>
-            <TableCell align="right">longitude</TableCell>
-            <TableCell align="right">latitude</TableCell>
-            <TableCell align="right">provider</TableCell>
-            <TableCell align="right">active</TableCell>
+            <TableCell>IP Address</TableCell>
+            <TableCell>longitude</TableCell>
+            <TableCell>latitude</TableCell>
+            <TableCell>provider</TableCell>
+            <TableCell>active</TableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={styles.table_body}>
-          {/* {towers.map(((tower , idx) => <TableCell>{idx+1}</TableCell>))}
-          {towers.map((tower => <TableCell>{tower.area}</TableCell>))} */}
           {towers.map((tower, idx) => (
             <TableRow sx={styles.table_row}>
               <TableCell>{idx + 1}</TableCell>
@@ -79,7 +65,13 @@ export default function SwitchTower() {
               <TableCell>{tower.latitude}</TableCell>
               <TableCell>{tower.provider}</TableCell>
               <TableCell>{tower.active === true ? "Yes" : "No"}</TableCell>
-              <Switch checked="checked" />
+              <Switch
+                checked={checked}
+                onClick={() => {
+                  towerSwitch(tower.id.id, tower.active);
+                }}
+              />
+              {/* {console.log(tower.id.id)} */}
             </TableRow>
           ))}
         </TableBody>
