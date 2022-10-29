@@ -29,6 +29,12 @@ export default function SwitchTower() {
     await updateDoc(towerDoc, newFields);
   };
 
+  const downTime = async (id) => {
+    const towerDoc = doc(db, "Towers", id);
+    const inActive = [{ DownTime:"", upTime:""}];
+    await updateDoc(towerDoc, {inActive});
+  };
+
   useEffect(() => {
     const getTowers = async () => {
       const data = await getDocs(towerCollectionRef);
@@ -40,6 +46,7 @@ export default function SwitchTower() {
  
 
   return (
+    <>
     <TableContainer sx={styles.container}>
       <Table aria-label="simple table" sx={styles.table}>
         <TableHead >
@@ -77,5 +84,7 @@ export default function SwitchTower() {
         </TableBody>
       </Table>
     </TableContainer>
+    <button onClick={()=>downTime("1R2Gt2QKqhezNNLQhhYI",)}>iabc</button>
+    </>
   );
 }

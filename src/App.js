@@ -5,8 +5,8 @@ import SwitchTower from "./screens/switch";
 function App() {
   return (
    <>
-   {/* <SwitchTower/> */}
-   <Home /> 
+   <SwitchTower/>
+   {/* <Home />  */}
    {/* <Add /> */}
    </>
   );
