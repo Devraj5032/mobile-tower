@@ -68,7 +68,7 @@ export default function Add() {
         <TextField
           size="small"
           id="ip"
-          type="number"
+          type="text"
           label="IP Address"
           placeholder="IP Address"
           value={tower.ip || ""}

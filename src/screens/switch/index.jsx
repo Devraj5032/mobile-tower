@@ -22,37 +22,36 @@ export default function SwitchTower() {
   const db = getFirestore(app);
   const [towers, setTowers] = useState([]);
   const towerCollectionRef = collection(db, "Towers");
-  const [checked, setChecked] = useState(true);
+
+  const towerSwitch = async (id, active) => {
+    const towerDoc = doc(db, "Towers", id);
+    const newFields = { active: active ? false : true };
+    await updateDoc(towerDoc, newFields);
+  };
 
   useEffect(() => {
     const getTowers = async () => {
       const data = await getDocs(towerCollectionRef);
       setTowers(data.docs.map((doc) => ({ ...doc.data(), id: doc })));
-      // console.log(data);
     };
-
     getTowers();
-  }, []);
+  }, [towerSwitch]);
 
-  const towerSwitch = async (id, active) => {
-    const towerDoc = doc(db, "Towers", id);
-    const newFields = { active: active === true ? false : true };
-    // setChecked(active === true ? false : true);
-    await updateDoc(towerDoc, newFields);
-  };
+ 
 
   return (
     <TableContainer sx={styles.container}>
       <Table aria-label="simple table" sx={styles.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Sl. No</TableCell>
-            <TableCell>Area</TableCell>
-            <TableCell>IP Address</TableCell>
-            <TableCell>longitude</TableCell>
-            <TableCell>latitude</TableCell>
-            <TableCell>provider</TableCell>
-            <TableCell>active</TableCell>
+        <TableHead >
+          <TableRow >
+            <TableCell sx={{fontWeight:"bold"}}>Sl. No</TableCell>
+            <TableCell sx={{fontWeight:"bold"}}>Area</TableCell>
+            <TableCell sx={{fontWeight:"bold"}}>IP Address</TableCell>
+            <TableCell sx={{fontWeight:"bold"}}>Longitude</TableCell>
+            <TableCell sx={{fontWeight:"bold"}}>Latitude</TableCell>
+            <TableCell sx={{fontWeight:"bold"}}>Provider</TableCell>
+            <TableCell sx={{fontWeight:"bold"}}>Status</TableCell>
+            <TableCell sx={{fontWeight:"bold"}}>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={styles.table_body}>
@@ -64,14 +63,15 @@ export default function SwitchTower() {
               <TableCell>{tower.longitude}</TableCell>
               <TableCell>{tower.latitude}</TableCell>
               <TableCell>{tower.provider}</TableCell>
-              <TableCell>{tower.active === true ? "Yes" : "No"}</TableCell>
+              <TableCell>{tower.active? "Active" : "Inactive"}</TableCell>
+              <TableCell>
               <Switch
-                checked={checked}
-                onClick={() => {
+                checked={tower.active}
+                onChange={() => {
                   towerSwitch(tower.id.id, tower.active);
                 }}
               />
-              {/* {console.log(tower.id.id)} */}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
