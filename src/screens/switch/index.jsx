@@ -23,27 +23,27 @@ export default function SwitchTower() {
   const [towers, setTowers] = useState([]);
   const towerCollectionRef = collection(db, "Towers");
 
-  const towerSwitch = async (id, active) => {
-    const towerDoc = doc(db, "Towers", id);
-    const newFields = { active: active ? false : true };
-    await updateDoc(towerDoc, newFields);
+  const getTowers = async () => {
+    const data = await getDocs(towerCollectionRef);
+    setTowers(data.docs.map((doc) => ({ ...doc.data(), id: doc })));
   };
 
-  const downTime = async (id) => {
+  const towerSwitch = async (id, active,arr) => {
     const towerDoc = doc(db, "Towers", id);
-    const inActive = [{ DownTime:"", upTime:""}];
+    const newFields = { active: active ? false : true };
+    await updateDoc(towerDoc, newFields).then(getTowers);
+    downTime(id,arr)
+  };
+
+  const downTime = async (id,arr) => {
+    const towerDoc = doc(db, "Towers", id);
+    const inActive = [{ DownTime:"2", upTime:"2"}].concat(arr);
     await updateDoc(towerDoc, {inActive});
   };
 
   useEffect(() => {
-    const getTowers = async () => {
-      const data = await getDocs(towerCollectionRef);
-      setTowers(data.docs.map((doc) => ({ ...doc.data(), id: doc })));
-    };
     getTowers();
-  }, [towerSwitch]);
-
- 
+  }, []); 
 
   return (
     <>
@@ -63,7 +63,7 @@ export default function SwitchTower() {
         </TableHead>
         <TableBody sx={styles.table_body}>
           {towers.map((tower, idx) => (
-            <TableRow sx={styles.table_row}>
+            <TableRow sx={styles.table_row} key={idx}>
               <TableCell>{idx + 1}</TableCell>
               <TableCell>{tower.area}</TableCell>
               <TableCell>{tower.ip}</TableCell>
@@ -75,16 +75,17 @@ export default function SwitchTower() {
               <Switch
                 checked={tower.active}
                 onChange={() => {
-                  towerSwitch(tower.id.id, tower.active);
+                  towerSwitch(tower.id.id, tower.active,tower.inActive?tower.inActive:[]);
                 }}
               />
+              {/* <button onClick={()=>downTime(tower.id.id,tower.inActive?tower.inActive:[])}>iabc</button> */}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
-    <button onClick={()=>downTime("1R2Gt2QKqhezNNLQhhYI",)}>iabc</button>
+    
     </>
   );
 }

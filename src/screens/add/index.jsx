@@ -4,10 +4,6 @@ import {
   getFirestore,
   addDoc,
   collection,
-  serverTimestamp,
-  onSnapshot,
-  query,
-  orderBy,
 } from "firebase/firestore";
 import { app } from "../../firebase";
 

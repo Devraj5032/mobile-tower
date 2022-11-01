@@ -1,4 +1,5 @@
 import React,{useState, useEffect} from 'react'
+import { useNavigate } from 'react-router-dom';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { styles } from './styles'
 import Container from '@mui/material/Container';
@@ -19,14 +20,15 @@ import {
 import {
   getFirestore,
   collection,
-  updateDoc,
-  doc,
   getDocs,
 } from "firebase/firestore";
 
 import { app } from '../../firebase'
 
-export default function Home() {
+export default function Home(props) {
+
+  let navigate = useNavigate();
+
   const db = getFirestore(app);
   const [towers, setTowers] = useState([]);
   const towerCollectionRef = collection(db, "Towers");
@@ -52,6 +54,7 @@ export default function Home() {
     };
     getTowers();
   }, []);
+
 
   const locations = [
     {
@@ -154,7 +157,7 @@ export default function Home() {
               <TableCell>{tower.provider}</TableCell>
               <TableCell>{tower.active? "Active" : "Inactive"}</TableCell>
               <TableCell>
-              <Button variant="text">view</Button>
+              <Button variant="text" onClick={()=>{props.setTower(tower);navigate("/towerDetails")}}>view</Button>
               </TableCell>
             </TableRow>
           ))}
