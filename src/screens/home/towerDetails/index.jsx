@@ -12,6 +12,8 @@ import {
   Box
 } from "@mui/material";
 
+import Moment from 'react-moment';
+
 
 export default function TowerDetails(props) {
    
@@ -39,9 +41,9 @@ export default function TowerDetails(props) {
           {props.tower.inActive.map((tower, idx) => (
             <TableRow sx={styles.table_row} key={idx}>
               <TableCell>{idx + 1}</TableCell>
-              <TableCell>{tower.DownTime}</TableCell>
-              <TableCell>{tower.upTime}</TableCell>
-              <TableCell>{}</TableCell>
+              <TableCell><Moment unix>{tower.DownTime.seconds}</Moment></TableCell>
+              <TableCell>{tower.upTime.seconds?<Moment unix>{tower.upTime.seconds}</Moment>:"-"}</TableCell>
+              <TableCell>{tower.upTime.seconds?<Moment to={tower.upTime.seconds}>{tower.DownTime.seconds}</Moment>:"-"}</TableCell>
             </TableRow>
           ))}
         </TableBody>

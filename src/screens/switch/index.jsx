@@ -6,6 +6,7 @@ import {
   updateDoc,
   doc,
   getDocs,
+  Timestamp
 } from "firebase/firestore";
 import {
   TableContainer,
@@ -26,24 +27,57 @@ export default function SwitchTower() {
   const getTowers = async () => {
     const data = await getDocs(towerCollectionRef);
     setTowers(data.docs.map((doc) => ({ ...doc.data(), id: doc })));
+    
   };
+
+
+  const downTime = async (id,arr,isActive) => {
+    const towerDoc = doc(db, "Towers", id);
+    // const inActive = [{ DownTime:serverTimestamp(), upTime:"2"}].concat(arr);
+    var inActive;
+    if(isActive){
+      inActive = [{ DownTime:Timestamp.now(), upTime:""}].concat(arr);
+    }
+    else{
+      const dt = arr[0].DownTime;
+      var inActive = arr;
+      inActive[0]={ DownTime:dt?dt:"", upTime:Timestamp.now()}
+    }
+    await updateDoc(towerDoc, {inActive}).then(getTowers);
+  };
+
 
   const towerSwitch = async (id, active,arr) => {
     const towerDoc = doc(db, "Towers", id);
     const newFields = { active: active ? false : true };
     await updateDoc(towerDoc, newFields).then(getTowers);
-    downTime(id,arr)
+    downTime(id,arr,active)
   };
 
-  const downTime = async (id,arr) => {
-    const towerDoc = doc(db, "Towers", id);
-    const inActive = [{ DownTime:"2", upTime:"2"}].concat(arr);
-    await updateDoc(towerDoc, {inActive});
-  };
+
 
   useEffect(() => {
     getTowers();
   }, []); 
+
+ 
+  // function ping(ip) {
+  //   var ws = new WebSocket("ws://" + ip);
+  //   console.log(ws)
+  //   ws.onerror = function(e){
+  //     console.log("yes")
+  //     ws = null;
+  //   };
+  //   setTimeout(function() { 
+  //     if(ws != null) {
+  //       ws.close();
+  //       ws = null;
+  //       console.log("No")
+  //     }
+  //   },2000);
+  // }
+
+  // ping("170.187.231.66")
 
   return (
     <>

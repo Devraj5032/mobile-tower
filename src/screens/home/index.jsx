@@ -21,6 +21,7 @@ import {
   getFirestore,
   collection,
   getDocs,
+  onSnapshot
 } from "firebase/firestore";
 
 import { app } from '../../firebase'
@@ -47,13 +48,28 @@ export default function Home(props) {
     lat: 41.3851, lng: 2.1734
   }
 
+  // useEffect(() => {
+  //   const getTowers = async () => {
+  //     const data = await getDocs(towerCollectionRef);
+  //     setTowers(data.docs.map((doc) => ({ ...doc.data(), id: doc })));
+  //   };
+  //   getTowers();
+  // }, []);
+
   useEffect(() => {
-    const getTowers = async () => {
-      const data = await getDocs(towerCollectionRef);
-      setTowers(data.docs.map((doc) => ({ ...doc.data(), id: doc })));
-    };
-    getTowers();
-  }, []);
+
+  const getTowers = onSnapshot (towerCollectionRef,(snap)=>{
+    setTowers(snap.docs.map((item)=>{
+        const id = item;
+        return {id, ...item.data()}
+    }))
+  })
+
+  return () => {
+    getTowers()
+  }
+
+},[])
 
 
   const locations = [
@@ -96,6 +112,8 @@ export default function Home(props) {
 
   return (
     <>
+      <Button onClick={()=>{navigate("/add")}} variant="text">Add</Button>
+      <Button onClick={()=>{navigate("/switchTower")}} variant="text">Switch</Button>
       <Container maxWidth="fullscreen" sx={styles.components}>
         <Box sx={{ minWidth: 120 ,my:4}}>
         <FormControl fullWidth>
