@@ -1,6 +1,6 @@
 import React,{useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { InfoWindow , GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { styles } from './styles'
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -44,9 +44,6 @@ export default function Home(props) {
     height: "70vh",
     width: "70%"};
   
-  const defaultCenter = {
-    lat: 41.3851, lng: 2.1734
-  }
 
   // useEffect(() => {
   //   const getTowers = async () => {
@@ -71,44 +68,73 @@ export default function Home(props) {
 
 },[])
 
+const center = {
+  lat:22.779973198187783, 
+  lng:86.16881421555077
+};
 
-  const locations = [
+  const markers = [
     {
+      id: 1,
       name: "Location 1",
-      location: { 
-        lat: 41.3954,
-        lng: 2.162 
+      position: { 
+        lat:22.779973198187793, 
+        lng:86.16881421555077
       },
     },
     {
+      id: 2,
       name: "Location 2",
-      location: { 
-        lat: 41.3917,
-        lng: 2.1649
+      position: { 
+        lat:22.779973198187783, 
+        lng:86.16881421555007
       },
     },
     {
+      id: 3,
       name: "Location 3",
-      location: { 
-        lat: 41.3773,
-        lng: 2.1585
+      position: { 
+        lat:22.779973198187703, 
+        lng:86.16881421555077
       },
     },
     {
+      id: 4,
       name: "Location 4",
-      location: { 
-        lat: 41.3797,
-        lng: 2.1682
+      position: { 
+        lat:22.779973198187783, 
+        lng:86.16881421555077
       },
     },
     {
+      id: 5,
       name: "Location 5",
-      location: { 
+      position: { 
         lat: 41.4055,
         lng: 2.1915
       },
     }
   ];
+
+  const [activeMarker, setActiveMarker] = useState(null);
+
+  const handleActiveMarker = (marker) => {
+    if (marker === activeMarker) {
+      return;
+    }
+    setActiveMarker(marker);
+  };
+
+  // const google = window.google
+
+  // const handleOnLoad = (map) => {
+  //   const bounds = new window.google.maps.LatLngBounds();
+  //   markers.forEach(({ position }) => bounds.extend(position));
+  //   map.fitBounds(bounds);
+  // };
+  const onLoad = marker => {
+    console.log('marker: ', marker)
+  }
 
   return (
     <>
@@ -135,19 +161,22 @@ export default function Home(props) {
         </Box>
 
         <LoadScript
-       googleMapsApiKey='YOUR_API_KEY_HERE'>
-        <GoogleMap
-          mapContainerStyle={mapStyles}
-          zoom={13}
-          center={defaultCenter}>
-         {
-            locations.map(item => {
-              return (
-              <Marker key={item.name} position={item.location}/>
-              )
-            })
-         }
-     </GoogleMap>
+       googleMapsApiKey='AIzaSyBXu3_xsd-bCytf8HPen5wW8dlw-Mvg-8U'>
+       <GoogleMap
+      // onLoad={handleOnLoad}
+      center={center}
+      zoom={13}
+      mapContainerStyle={{ width: "70%", height: "70vh" }}
+    >
+      {markers.map( item => {
+        <Marker
+          onLoad={onLoad}
+          key={item.name}
+          position={item.position}
+        >
+        </Marker>
+})}
+    </GoogleMap>
      </LoadScript>
 
      <TableContainer sx={{my:4}}>
