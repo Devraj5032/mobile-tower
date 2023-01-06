@@ -22,57 +22,10 @@ import {
   TableBody,
   Button,
 } from "@mui/material";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  onSnapshot,
-} from "firebase/firestore";
+import CellTowerIcon from "@mui/icons-material/CellTower";
+import { getFirestore, collection, onSnapshot } from "firebase/firestore";
 
 import { app } from "../../firebase";
-
-const markers = [
-  {
-    id: 1,
-    name: "Location 1",
-    position: {
-      lat: 22.779973198187793,
-      lng: 86.16881421555077,
-    },
-  },
-  {
-    id: 2,
-    name: "Location 2",
-    position: {
-      lat: 22.779973198187783,
-      lng: 87.16881421555007,
-    },
-  },
-  {
-    id: 3,
-    name: "Location 3",
-    position: {
-      lat: 22.779973198187703,
-      lng: 88.16881421555077,
-    },
-  },
-  {
-    id: 4,
-    name: "Location 4",
-    position: {
-      lat: 22.779973198187783,
-      lng: 89.16881421555077,
-    },
-  },
-  {
-    id: 5,
-    name: "Location 5",
-    position: {
-      lat: 41.4055,
-      lng: 90.1915,
-    },
-  },
-];
 
 const center = {
   lat: 22.779973198187783,
@@ -81,24 +34,16 @@ const center = {
 
 export default function Home(props) {
   let navigate = useNavigate();
-  
+
   const db = getFirestore(app);
   const [towers, setTowers] = useState([]);
   const towerCollectionRef = collection(db, "Towers");
   const [area, setArea] = useState("Adityapur");
   const [activeMarker, setActiveMarker] = useState(null);
-  
-  const google = window.google;
-  
+
   const handleChange = (event) => {
     setArea(event.target.value);
   };
-
-  const mapStyles = {
-    height: "70vh",
-    width: "70%",
-  };
-  // }, []);
 
   useEffect(() => {
     const getTowers = onSnapshot(towerCollectionRef, (snap) => {
@@ -120,12 +65,6 @@ export default function Home(props) {
       return;
     }
     setActiveMarker(marker);
-  };
-
-
-
-  const onLoad = (marker) => {
-    console.log("marker: ", marker);
   };
 
   return (
@@ -165,24 +104,25 @@ export default function Home(props) {
             </Select>
           </FormControl>
         </Box>
-
         <LoadScript googleMapsApiKey="AIzaSyBXu3_xsd-bCytf8HPen5wW8dlw-Mvg-8U">
           <GoogleMap
             // onLoad={handleOnLoad}
             center={center}
-            zoom={13}
+            zoom={12}
             mapContainerStyle={{ width: "70%", height: "70vh" }}
           >
-            {markers.map((item) => 
-            <Marker
-              onLoad={onLoad}
-              key={item.name}
-              position={item.position}
-            ></Marker>
-            )}
+            {towers?.map((item) => (
+              <Marker
+                key={item?.latitude}
+                name={item?.ip}
+                position={{
+                  lat: parseFloat(item?.latitude),
+                  lng: parseFloat(item?.longitude),
+                }}
+              ></Marker>
+            ))}
           </GoogleMap>
         </LoadScript>
-
         <TableContainer sx={{ my: 4 }}>
           <Table aria-label="simple table" sx={styles.table}>
             <TableHead>
